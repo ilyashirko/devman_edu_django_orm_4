@@ -10,11 +10,13 @@ class Pokemon(models.Model):
     title_en = models.CharField(
         verbose_name='Название покемона (англ)',
         max_length=40,
+        null=True,
         blank=True
     )
     title_jp = models.CharField(
         verbose_name='Название покемона (яп)',
         max_length=40,
+        null=True,
         blank=True
     )
     image = models.ImageField(
@@ -67,36 +69,43 @@ class PokemonEntity(models.Model):
     appeared_at = models.DateTimeField(
         verbose_name='Появляется в',
         default=None,
+        null=True,
         blank=False
     )
     disappeared_at = models.DateTimeField(
         verbose_name='Исчезает в',
         default=None,
+        null=True,
         blank=False
     )
     level = models.PositiveSmallIntegerField(
         verbose_name='Уровень',
         default=None,
+        null=True,
         blank=False
     )
     health = models.PositiveSmallIntegerField(
         verbose_name='Здоровье',
         default=None,
+        null=True,
         blank=False
     )
     strength = models.PositiveSmallIntegerField(
         verbose_name='Сила',
         default=None,
+        null=True,
         blank=False
     )
     defence = models.PositiveSmallIntegerField(
         verbose_name='Защита',
         default=None,
+        null=True,
         blank=False
     )
     stamina = models.PositiveSmallIntegerField(
         verbose_name='Выносливость',
         default=None,
+        null=True,
         blank=False
     )
 
