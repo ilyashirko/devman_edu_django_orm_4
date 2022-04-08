@@ -26,16 +26,16 @@ class Pokemon(models.Model):
         verbose_name='Описание покемона',
         blank=True
     )
-
     evolution = models.ForeignKey(
+        verbose_name='В кого эволюционирует',
         to='self',
         on_delete=models.CASCADE,
         default=None,
         null=True,
         blank=True
     )
-
     deevolution = models.ForeignKey(
+        verbose_name='Из кого эволюционировал',
         to='self',
         related_name='+',
         on_delete=models.CASCADE,
@@ -50,38 +50,55 @@ class Pokemon(models.Model):
 
 class PokemonEntity(models.Model):
     pokemon = models.ForeignKey(
-        verbose_name='Pokemon',
+        verbose_name='Покемон',
         to=Pokemon,
         on_delete=models.CASCADE
-        )
-
-    latitude = models.FloatField(max_length=15, blank=False)
-    longitude = models.FloatField(max_length=15, blank=False)
-    
-    appeared_at = models.DateTimeField(default=None, blank=False)
-    disappeared_at = models.DateTimeField(default=None, blank=False)
-
+    )
+    latitude = models.FloatField(
+        verbose_name='Широта',
+        max_length=15,
+        blank=False
+    )
+    longitude = models.FloatField(
+        verbose_name='Долгота',
+        max_length=15,
+        blank=False
+    )
+    appeared_at = models.DateTimeField(
+        verbose_name='Появляется в',
+        default=None,
+        blank=False
+    )
+    disappeared_at = models.DateTimeField(
+        verbose_name='Исчезает в',
+        default=None,
+        blank=False
+    )
     level = models.PositiveSmallIntegerField(
+        verbose_name='Уровень',
         default=None,
         blank=False
     )
     health = models.PositiveSmallIntegerField(
+        verbose_name='Здоровье',
         default=None,
         blank=False
     )
     strength = models.PositiveSmallIntegerField(
+        verbose_name='Сила',
         default=None,
         blank=False
     )
     defence = models.PositiveSmallIntegerField(
+        verbose_name='Защита',
         default=None,
         blank=False
     )
     stamina = models.PositiveSmallIntegerField(
+        verbose_name='Выносливость',
         default=None,
         blank=False
     )
-
 
     def __str__(self):
         return f'{self.pokemon.title}:   {self.latitude}, {self.longitude}'

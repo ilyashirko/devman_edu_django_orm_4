@@ -5,9 +5,6 @@ from django.http import HttpResponseNotFound, HttpRequest
 from django.shortcuts import render
 from pokemon_entities.models import Pokemon, PokemonEntity
 
-
-
-
 MOSCOW_CENTER = [55.751244, 37.618423]
 DEFAULT_IMAGE_URL = (
     'https://vignette.wikia.nocookie.net/pokemon/images/6/6e/%21.png/revision'
@@ -29,6 +26,10 @@ def add_pokemon(folium_map, lat, lon, image_url=DEFAULT_IMAGE_URL):
     ).add_to(folium_map)
 
 
+def make_url(request: HttpRequest, relative_path: str) -> str:
+    return f'{HttpRequest.build_absolute_uri(request, relative_path)}'
+
+
 def show_all_pokemons(request):
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for entity in PokemonEntity.objects.all():
@@ -43,7 +44,7 @@ def show_all_pokemons(request):
     for pokemon in Pokemon.objects.all():
         pokemons_on_page.append({
             'pokemon_id': pokemon.id,
-            'img_url': f'{HttpRequest.build_absolute_uri(request, f"/media/{pokemon.image}")}',
+            'img_url': make_url(request, f"/media/{pokemon.image}"),
             'title_ru': pokemon.title,
         })
 
@@ -64,7 +65,7 @@ def show_pokemon(request, pokemon_id):
         "title_ru": requested_pokemon.title,
         "title_en": requested_pokemon.title_en,
         "title_jp": requested_pokemon.title_jp,
-        "img_url": f'{HttpRequest.build_absolute_uri(request, f"/media/{requested_pokemon.image}")}',
+        "img_url": make_url(request, f"/media/{requested_pokemon.image}"),
         "description": requested_pokemon.description,
     }
 
@@ -73,26 +74,33 @@ def show_pokemon(request, pokemon_id):
             "next_evolution": {
                 "title_ru": requested_pokemon.evolution.title,
                 "pokemon_id": requested_pokemon.evolution.id,
-                "img_url": f'{HttpRequest.build_absolute_uri(request, f"/media/{requested_pokemon.evolution.image}")}'
+                "img_url": make_url(
+                    request,
+                    f"/media/{requested_pokemon.evolution.image}"
+                )
             }
         })
-    
+
     if requested_pokemon.deevolution:
         pokemon.update({
             "previous_evolution": {
                 "title_ru": requested_pokemon.deevolution.title,
                 "pokemon_id": requested_pokemon.deevolution.id,
-                "img_url": f'{HttpRequest.build_absolute_uri(request, f"/media/{requested_pokemon.deevolution.image}")}'
+                "img_url": make_url(
+                    request,
+                    f"/media/{requested_pokemon.deevolution.image}"
+                )
             }
         })
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
-    for pokemon_entity in PokemonEntity.objects.filter(pokemon=requested_pokemon):
+    pokemon_entities = PokemonEntity.objects.filter(pokemon=requested_pokemon)
+    for pokemon_entity in pokemon_entities:
         add_pokemon(
             folium_map,
             pokemon_entity.latitude,
             pokemon_entity.longitude,
-            f'{HttpRequest.build_absolute_uri(request, f"/media/{requested_pokemon.image}")}'
+            make_url(request, f"/media/{requested_pokemon.image}")
         )
 
     return render(request, 'pokemon.html', context={
