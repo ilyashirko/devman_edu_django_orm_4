@@ -36,7 +36,8 @@ class Pokemon(models.Model):
     )
 
     deevolution = models.ForeignKey(
-        to='Pokemon',
+        to='self',
+        related_name='+',
         on_delete=models.CASCADE,
         default=None,
         null=True,

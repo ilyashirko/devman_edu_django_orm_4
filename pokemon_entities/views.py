@@ -79,7 +79,7 @@ def show_pokemon(request, pokemon_id):
     
     if requested_pokemon.deevolution:
         pokemon.update({
-            "next_evolution": {
+            "previous_evolution": {
                 "title_ru": requested_pokemon.deevolution.title,
                 "pokemon_id": requested_pokemon.deevolution.id,
                 "img_url": f'{HttpRequest.build_absolute_uri(request, f"/media/{requested_pokemon.deevolution.image}")}'
