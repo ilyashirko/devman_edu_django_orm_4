@@ -1,5 +1,5 @@
 import folium
-import json
+
 
 from django.http import HttpResponseNotFound, HttpRequest
 from django.shortcuts import render
@@ -38,15 +38,15 @@ def show_all_pokemons(request):
             entity.longitude,
             f'media/{entity.pokemon.image}'
         )
-    
+
     pokemons_on_page = []
     for pokemon in Pokemon.objects.all():
         pokemons_on_page.append({
             'pokemon_id': pokemon.id,
-            'img_url': f'media/{pokemon.image}',
+            'img_url': f'{HttpRequest.build_absolute_uri(request, f"/media/{pokemon.image}")}',
             'title_ru': pokemon.title,
         })
-    
+
     return render(request, 'mainpage.html', context={
         'map': folium_map._repr_html_(),
         'pokemons': pokemons_on_page,
@@ -54,22 +54,24 @@ def show_all_pokemons(request):
 
 
 def show_pokemon(request, pokemon_id):
-    with open('pokemon_entities/pokemons.json', encoding='utf-8') as database:
-        pokemons = json.load(database)['pokemons']
-
-    for pokemon in pokemons:
-        if pokemon['pokemon_id'] == int(pokemon_id):
-            requested_pokemon = pokemon
-            break
-    else:
+    try:
+        requested_pokemon = Pokemon.objects.get(id=pokemon_id)
+    except AttributeError:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
 
+    pokemon = {
+        "pokemon_id": requested_pokemon.id,
+        "title_ru": requested_pokemon.title,
+        "img_url": f'{HttpRequest.build_absolute_uri(request, f"/media/{requested_pokemon.image}")}'
+    }
+
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
-    for pokemon_entity in requested_pokemon['entities']:
+    for pokemon_entity in PokemonEntity.objects.filter(pokemon=requested_pokemon):
         add_pokemon(
-            folium_map, pokemon_entity['lat'],
-            pokemon_entity['lon'],
-            pokemon['img_url']
+            folium_map,
+            pokemon_entity.latitude,
+            pokemon_entity.longitude,
+            f'{HttpRequest.build_absolute_uri(request, f"/media/{requested_pokemon.image}")}'
         )
 
     return render(request, 'pokemon.html', context={
