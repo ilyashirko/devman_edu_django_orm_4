@@ -41,3 +41,8 @@ python3 manage.py runserver
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org).
+
+
+Создать миграции
+python3 manage.py makemigrations
+python3 manage.py migrate
