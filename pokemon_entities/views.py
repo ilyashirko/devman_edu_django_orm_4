@@ -1,8 +1,11 @@
 import folium
 import json
 
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpRequest
 from django.shortcuts import render
+from pokemon_entities.models import PokemonEntity
+
+
 
 
 MOSCOW_CENTER = [55.751244, 37.618423]
@@ -38,15 +41,16 @@ def show_all_pokemons(request):
                 pokemon_entity['lon'],
                 pokemon['img_url']
             )
-
+    
+    pokemons_entities = PokemonEntity.objects.all()
     pokemons_on_page = []
-    for pokemon in pokemons:
+    for entity in pokemons_entities:
         pokemons_on_page.append({
-            'pokemon_id': pokemon['pokemon_id'],
-            'img_url': pokemon['img_url'],
-            'title_ru': pokemon['title_ru'],
+            'pokemon_id': entity.pokemon.id,
+            'img_url': f'media/{entity.pokemon.image}',
+            'title_ru': entity.pokemon.title,
         })
-
+    
     return render(request, 'mainpage.html', context={
         'map': folium_map._repr_html_(),
         'pokemons': pokemons_on_page,
