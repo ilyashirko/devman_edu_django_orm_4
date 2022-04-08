@@ -1,3 +1,6 @@
+Основа сайта by [DEVMAN](https://dvmn.org).
+`models.py`, работа с БД в `admin.py`, `views.py` by [@IlyaShirko](https://github.com/ilyashirko)
+
 # Карта покемонов
 
 ![screenshot](https://dvmn.org/filer/canonical/1563275070/172/)
@@ -17,11 +20,21 @@
 ### Как запустить
 
 Для запуска сайта вам понадобится Python третьей версии.
-
+(https://dvmn.org).
 Скачайте код с GitHub. Затем установите зависимости
 
 ```sh
 pip install -r requirements.txt
+```
+
+Создайте базу данных
+```sh
+python3 manage.py makemigrations
+python3 manage.py migrate
+```  
+Создайте суперпользователя для доступа в админ консоль сайта
+```sh
+python3 manage.py createsuperuser
 ```
 
 Запустите разработческий сервер
@@ -38,11 +51,13 @@ python3 manage.py runserver
 - `DEBUG` — дебаг-режим. Поставьте True, чтобы увидеть отладочную информацию в случае ошибки.
 - `SECRET_KEY` — секретный ключ проекта
 
+### [Главная страница сайта](http://127.0.0.1:8000/)
+### [Вход в админ консоль сайта](http://127.0.0.1:8000/admin)
+### Не забудьте добавить в базу данных покемонов, чтобы на сайте было что отображать
+
+
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org).
 
 
-Создать миграции
-python3 manage.py makemigrations
-python3 manage.py migrate
