@@ -22,7 +22,26 @@ class Pokemon(models.Model):
         null=True,
         blank=True
     )
-    description = models.TextField(verbose_name='Описание покемона', blank=True)
+    description = models.TextField(
+        verbose_name='Описание покемона',
+        blank=True
+    )
+
+    evolution = models.ForeignKey(
+        to='self',
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True
+    )
+
+    deevolution = models.ForeignKey(
+        to='Pokemon',
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.title

@@ -65,8 +65,26 @@ def show_pokemon(request, pokemon_id):
         "title_en": requested_pokemon.title_en,
         "title_jp": requested_pokemon.title_jp,
         "img_url": f'{HttpRequest.build_absolute_uri(request, f"/media/{requested_pokemon.image}")}',
-        "description": requested_pokemon.description
+        "description": requested_pokemon.description,
     }
+
+    if requested_pokemon.evolution:
+        pokemon.update({
+            "next_evolution": {
+                "title_ru": requested_pokemon.evolution.title,
+                "pokemon_id": requested_pokemon.evolution.id,
+                "img_url": f'{HttpRequest.build_absolute_uri(request, f"/media/{requested_pokemon.evolution.image}")}'
+            }
+        })
+    
+    if requested_pokemon.deevolution:
+        pokemon.update({
+            "next_evolution": {
+                "title_ru": requested_pokemon.deevolution.title,
+                "pokemon_id": requested_pokemon.deevolution.id,
+                "img_url": f'{HttpRequest.build_absolute_uri(request, f"/media/{requested_pokemon.deevolution.image}")}'
+            }
+        })
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon_entity in PokemonEntity.objects.filter(pokemon=requested_pokemon):
