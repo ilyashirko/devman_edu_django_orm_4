@@ -118,3 +118,4 @@ dmypy.json
 media
 images
 pokemon_entities/pokemons.json
+pokemon_entities/migrations/
