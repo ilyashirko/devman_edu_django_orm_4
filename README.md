@@ -1,4 +1,4 @@
-Основа сайта by [DEVMAN](https://dvmn.org).
+Основа сайта by [DEVMAN](https://dvmn.org).  
 `models.py`, работа с БД в `admin.py`, `views.py` by [@IlyaShirko](https://github.com/ilyashirko)
 
 # Карта покемонов
