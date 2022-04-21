@@ -67,7 +67,7 @@ def show_pokemon(request, pokemon_id):
     except AttributeError:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
     except Pokemon.MultipleObjectsReturned as error:
-        return TooManyPokemonsFound(error, pokemon_id, requested_pokemon)
+        return 
 
     seiralized_pokemon = {
         "pokemon_id": requested_pokemon.id,
@@ -75,7 +75,7 @@ def show_pokemon(request, pokemon_id):
         "title_en": requested_pokemon.title_en,
         "title_jp": requested_pokemon.title_jp,
         "img_url": request.build_absolute_uri(
-            location=f"/media/{requested_pokemon.image}"
+            location=f"{MEDIA_DIR}/{requested_pokemon.image}"
         ),
         "description": requested_pokemon.description,
     }
@@ -85,7 +85,7 @@ def show_pokemon(request, pokemon_id):
                 "title_ru": requested_pokemon.evolves_into.title,
                 "pokemon_id": requested_pokemon.evolves_into.id,
                 "img_url": request.build_absolute_uri(
-                    location=f"/media/{requested_pokemon.evolves_into.image}"
+                    location=f"{MEDIA_DIR}/{requested_pokemon.evolves_into.image}"
                 )
             }
         })
@@ -96,7 +96,7 @@ def show_pokemon(request, pokemon_id):
                 "title_ru": evolution_from[0].title,
                 "pokemon_id": evolution_from[0].id,
                 "img_url": request.build_absolute_uri(
-                    location=f"/media/{evolution_from[0].image}"
+                    location=f"{MEDIA_DIR}/{evolution_from[0].image}"
                 )
             }
         })
@@ -111,7 +111,7 @@ def show_pokemon(request, pokemon_id):
             pokemon_entity.latitude,
             pokemon_entity.longitude,
             request.build_absolute_uri(
-                location=f"/media/{requested_pokemon.image}"
+                location=f"{MEDIA_DIR}/{requested_pokemon.image}"
             )
         )
 
