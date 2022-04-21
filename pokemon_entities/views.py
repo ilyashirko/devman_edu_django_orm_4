@@ -1,5 +1,5 @@
 import folium
-
+from pogomap.settings import MEDIA_URL
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from pokemon_entities.models import Pokemon, PokemonEntity
@@ -10,6 +10,17 @@ DEFAULT_IMAGE_URL = (
     '/latest/fixed-aspect-ratio-down/width/240/height/240?cb=20130525215832'
     '&fill=transparent'
 )
+MEDIA_DIR = ''.join(MEDIA_URL.split('/'))
+
+
+class TooManyPokemonsFound(Exception):
+    def __init__(self, error_message, pokemon_id, pokemons):
+        self.error_message = error_message
+        self.pokemon_id = pokemon_id
+        self.pokemons = pokemons
+    
+    def __str__(self):
+        return f'{self.error_message}\nPokemon ID: {self.pokemon_id}\n{self.pokemons}'
 
 
 def add_pokemon(folium_map, lat, lon, image_url=DEFAULT_IMAGE_URL):
@@ -32,15 +43,14 @@ def show_all_pokemons(request):
             folium_map,
             entity.latitude,
             entity.longitude,
-            f'media/{entity.pokemon.image}'
+            f'{MEDIA_DIR}/{entity.pokemon.image}'
         )
-
     pokemons_on_page = []
     for pokemon in Pokemon.objects.all():
         pokemons_on_page.append({
             'pokemon_id': pokemon.id,
             'img_url': request.build_absolute_uri(
-                location=f"/media/{pokemon.image}"
+                location=f"{MEDIA_DIR}/{pokemon.image}"
             ),
             'title_ru': pokemon.title,
         })
@@ -56,8 +66,8 @@ def show_pokemon(request, pokemon_id):
         requested_pokemon = Pokemon.objects.get(id=pokemon_id)
     except AttributeError:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
-    except Pokemon.MultipleObjectsReturned:
-        requested_pokemon = requested_pokemon[0]
+    except Pokemon.MultipleObjectsReturned as error:
+        return TooManyPokemonsFound(error, pokemon_id, requested_pokemon)
 
     seiralized_pokemon = {
         "pokemon_id": requested_pokemon.id,
@@ -69,17 +79,17 @@ def show_pokemon(request, pokemon_id):
         ),
         "description": requested_pokemon.description,
     }
-    if requested_pokemon.evolution is not None:
+    if requested_pokemon.evolves_into is not None:
         seiralized_pokemon.update({
             "next_evolution": {
-                "title_ru": requested_pokemon.evolution.title,
-                "pokemon_id": requested_pokemon.evolution.id,
+                "title_ru": requested_pokemon.evolves_into.title,
+                "pokemon_id": requested_pokemon.evolves_into.id,
                 "img_url": request.build_absolute_uri(
-                    location=f"/media/{requested_pokemon.evolution.image}"
+                    location=f"/media/{requested_pokemon.evolves_into.image}"
                 )
             }
         })
-    evolution_from = requested_pokemon.evo_from.all()
+    evolution_from = requested_pokemon.evolved_from.all()
     if evolution_from:
         seiralized_pokemon.update({
             "previous_evolution": {
@@ -93,7 +103,7 @@ def show_pokemon(request, pokemon_id):
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
 
-    pokemon_entities = requested_pokemon.location.all()
+    pokemon_entities = requested_pokemon.entities.all()
 
     for pokemon_entity in pokemon_entities:
         add_pokemon(

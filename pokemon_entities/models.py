@@ -9,13 +9,11 @@ class Pokemon(models.Model):
     title_en = models.CharField(
         verbose_name='Название покемона (англ)',
         max_length=40,
-        default='',
         blank=True
     )
     title_jp = models.CharField(
         verbose_name='Название покемона (яп)',
         max_length=40,
-        default='',
         blank=True
     )
     image = models.ImageField(
@@ -25,9 +23,9 @@ class Pokemon(models.Model):
         verbose_name='Описание покемона',
         blank=True
     )
-    evolution = models.ForeignKey(
+    evolves_into = models.ForeignKey(
         verbose_name='В кого эволюционирует',
-        related_name='evo_from',
+        related_name='evolved_from',
         to='self',
         on_delete=models.SET_NULL,
         null=True,
@@ -42,7 +40,7 @@ class PokemonEntity(models.Model):
     pokemon = models.ForeignKey(
         verbose_name='Покемон',
         to=Pokemon,
-        related_name='location',
+        related_name='entities',
         on_delete=models.CASCADE
     )
     latitude = models.FloatField(
@@ -55,35 +53,28 @@ class PokemonEntity(models.Model):
     )
     appeared_at = models.DateTimeField(
         verbose_name='Появляется в',
-        default=None,
         null=True,
         blank=True
     )
     disappeared_at = models.DateTimeField(
         verbose_name='Исчезает в',
-        default=None,
         null=True,
         blank=True
     )
     level = models.PositiveSmallIntegerField(
-        verbose_name='Уровень',
-        default=0
+        verbose_name='Уровень'
     )
     health = models.PositiveSmallIntegerField(
-        verbose_name='Здоровье',
-        default=0
+        verbose_name='Здоровье'
     )
     strength = models.PositiveSmallIntegerField(
-        verbose_name='Сила',
-        default=0
+        verbose_name='Сила'
     )
     defence = models.PositiveSmallIntegerField(
-        verbose_name='Защита',
-        default=0
+        verbose_name='Защита'
     )
     stamina = models.PositiveSmallIntegerField(
-        verbose_name='Выносливость',
-        default=0
+        verbose_name='Выносливость'
     )
 
     def __str__(self):
