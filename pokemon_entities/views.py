@@ -10,7 +10,6 @@ DEFAULT_IMAGE_URL = (
     '/latest/fixed-aspect-ratio-down/width/240/height/240?cb=20130525215832'
     '&fill=transparent'
 )
-MEDIA_DIR = ''.join(MEDIA_URL.split('/'))
 
 
 class TooManyPokemonsFound(Exception):
@@ -43,31 +42,31 @@ def show_all_pokemons(request):
             folium_map,
             entity.latitude,
             entity.longitude,
-            f'{MEDIA_DIR}/{entity.pokemon.image}'
+            request.build_absolute_uri(
+                location=f"{MEDIA_URL}{entity.pokemon.image}"
+            )
         )
     pokemons_on_page = []
     for pokemon in Pokemon.objects.all():
         pokemons_on_page.append({
             'pokemon_id': pokemon.id,
             'img_url': request.build_absolute_uri(
-                location=f"{MEDIA_DIR}/{pokemon.image}"
+                location=f"{MEDIA_URL}{pokemon.image}"
             ),
             'title_ru': pokemon.title,
         })
-
+    
     return render(request, 'mainpage.html', context={
         'map': folium_map._repr_html_(),
         'pokemons': pokemons_on_page,
     })
-
+    
 
 def show_pokemon(request, pokemon_id):
     try:
         requested_pokemon = Pokemon.objects.get(id=pokemon_id)
     except AttributeError:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
-    except Pokemon.MultipleObjectsReturned as error:
-        return 
 
     seiralized_pokemon = {
         "pokemon_id": requested_pokemon.id,
@@ -75,7 +74,7 @@ def show_pokemon(request, pokemon_id):
         "title_en": requested_pokemon.title_en,
         "title_jp": requested_pokemon.title_jp,
         "img_url": request.build_absolute_uri(
-            location=f"{MEDIA_DIR}/{requested_pokemon.image}"
+            location=f"{MEDIA_URL}{requested_pokemon.image}"
         ),
         "description": requested_pokemon.description,
     }
@@ -85,7 +84,7 @@ def show_pokemon(request, pokemon_id):
                 "title_ru": requested_pokemon.evolves_into.title,
                 "pokemon_id": requested_pokemon.evolves_into.id,
                 "img_url": request.build_absolute_uri(
-                    location=f"{MEDIA_DIR}/{requested_pokemon.evolves_into.image}"
+                    location=f"{MEDIA_URL}{requested_pokemon.evolves_into.image}"
                 )
             }
         })
@@ -96,14 +95,14 @@ def show_pokemon(request, pokemon_id):
                 "title_ru": evolution_from[0].title,
                 "pokemon_id": evolution_from[0].id,
                 "img_url": request.build_absolute_uri(
-                    location=f"{MEDIA_DIR}/{evolution_from[0].image}"
+                    location=f"{MEDIA_URL}{evolution_from[0].image}"
                 )
             }
         })
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
-
-    pokemon_entities = requested_pokemon.entities.all()
+    
+    pokemon_entities = PokemonEntity.objects.filter(id=pokemon_id)
 
     for pokemon_entity in pokemon_entities:
         add_pokemon(
@@ -111,10 +110,10 @@ def show_pokemon(request, pokemon_id):
             pokemon_entity.latitude,
             pokemon_entity.longitude,
             request.build_absolute_uri(
-                location=f"{MEDIA_DIR}/{requested_pokemon.image}"
+                location=f"{MEDIA_URL}{requested_pokemon.image}"
             )
         )
-
+    
     return render(request, 'pokemon.html', context={
         'map': folium_map._repr_html_(), 'pokemon': seiralized_pokemon
     })
