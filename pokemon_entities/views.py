@@ -17,9 +17,10 @@ class TooManyPokemonsFound(Exception):
         self.error_message = error_message
         self.pokemon_id = pokemon_id
         self.pokemons = pokemons
-    
+
     def __str__(self):
-        return f'{self.error_message}\nPokemon ID: {self.pokemon_id}\n{self.pokemons}'
+        return (f'{self.error_message}\nPokemon ID: '
+                f'{self.pokemon_id}\n{self.pokemons}')
 
 
 def add_pokemon(folium_map, lat, lon, image_url=DEFAULT_IMAGE_URL):
@@ -55,12 +56,12 @@ def show_all_pokemons(request):
             ),
             'title_ru': pokemon.title,
         })
-    
+
     return render(request, 'mainpage.html', context={
         'map': folium_map._repr_html_(),
         'pokemons': pokemons_on_page,
     })
-    
+
 
 def show_pokemon(request, pokemon_id):
     try:
@@ -84,7 +85,9 @@ def show_pokemon(request, pokemon_id):
                 "title_ru": requested_pokemon.evolves_into.title,
                 "pokemon_id": requested_pokemon.evolves_into.id,
                 "img_url": request.build_absolute_uri(
-                    location=f"{MEDIA_URL}{requested_pokemon.evolves_into.image}"
+                    location=(
+                        f"{MEDIA_URL}{requested_pokemon.evolves_into.image}"
+                    )
                 )
             }
         })
@@ -101,7 +104,7 @@ def show_pokemon(request, pokemon_id):
         })
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
-    
+
     pokemon_entities = PokemonEntity.objects.filter(id=pokemon_id)
 
     for pokemon_entity in pokemon_entities:
@@ -113,7 +116,7 @@ def show_pokemon(request, pokemon_id):
                 location=f"{MEDIA_URL}{requested_pokemon.image}"
             )
         )
-    
+
     return render(request, 'pokemon.html', context={
         'map': folium_map._repr_html_(), 'pokemon': seiralized_pokemon
     })
